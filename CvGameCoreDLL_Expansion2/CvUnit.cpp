@@ -10428,7 +10428,7 @@ bool CvUnit::pillage()
 					if (iEra <= 0)
 						iEra = 1;
 
-					iPillageGold = 3 + (pkImprovement->GetPillageGold() * iEra * (((75 + GC.getGame().getSmallFakeRandNum(50, *plot())) / 100)));
+					iPillageGold = 3 + (pkImprovement->GetPillageGold() * iEra * (((75 + max(1, GC.getGame().getSmallFakeRandNum(50, *plot()))) / 100)));
 					iPillageGold += (getPillageChange() * iPillageGold) / 100;
 				}
 				else
@@ -28413,9 +28413,12 @@ bool CvUnit::SentryAlert() const
 #endif
 {
 	VALIDATE_OBJECT
+	if (GetActivityType() == ACTIVITY_SLEEP)
+		return false;
+
 	int iRange = visibilityRange();
 #if defined(MOD_BALANCE_CORE)
-	if(getDomainType() == DOMAIN_AIR)
+	if (getDomainType() == DOMAIN_AIR)
 	{
 		iRange = GetRange();
 		if(iRange > 0)
@@ -29995,6 +29998,14 @@ CvPlot* CvUnit::GetPathLastPlot() const
 		return m_kLastPath.GetFinalPlot();
 }
 
+int CvUnit::GetMovementPointsAtCachedTarget() const
+{
+	if (!IsCachedPathValid() || m_kLastPath.empty())
+		return -1;
+
+	return m_kLastPath.back().m_iMoves;
+}
+
 // PRIVATE METHODS
 
 //	--------------------------------------------------------------------------------
@@ -30502,6 +30513,9 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iExtra = getExtraCityAttackPercent();
 		iTemp *= (100 + iExtra);
 		iTemp /= 100;
+		if (iExtra <= 0)
+			iTemp /= 2;
+
 		iValue += iTemp + iFlavorOffense * 5;
 		if(isRanged())
 		{
@@ -30647,6 +30661,20 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iTemp + iFlavorDefense * 4;
 	}
 
+	iTemp = pkPromotionInfo->GetOutsideFriendlyLandsModifier();
+	if (iTemp != 0)
+	{
+		if ((AI_getUnitAIType() == UNITAI_EXPLORE) ||
+			(AI_getUnitAIType() == UNITAI_EXPLORE_SEA))
+		{
+			iValue += iTemp * (5 + iFlavorRecon * 2);
+		}
+		else
+		{
+			iValue += iTemp * (iFlavorRecon * 2);
+		}		
+	}
+
 	if(pkPromotionInfo->IsRangeAttackIgnoreLOS() && isRanged())
 	{
 		iValue += 75 + iFlavorRanged * 10;
@@ -30722,7 +30750,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iExtra;
 	}
 
-	if(GC.getPromotionInfo(ePromotion)->IsHealOutsideFriendly() && getDomainType() == DOMAIN_SEA)
+	if (pkPromotionInfo->IsHealOutsideFriendly() && getDomainType() == DOMAIN_SEA)
 	{
 		iValue += 50 + iFlavorNaval * 2;
 	}
@@ -30895,15 +30923,15 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			{
 				if(AI_getUnitAIType() == UNITAI_EXPLORE)
 				{
-					iValue += 5 * (iFlavorRecon + iFlavorMobile);
+					iValue += 8 * (iFlavorRecon + iFlavorMobile);
 				}
 				else if((AI_getUnitAIType() == UNITAI_ATTACK) || (AI_getUnitAIType() == UNITAI_FAST_ATTACK))
 				{
-					iValue += 3 * (iFlavorOffense + iFlavorMobile);
+					iValue += 4 * (iFlavorOffense + iFlavorMobile);
 				}
 				else
 				{
-					iValue += 3 * iFlavorMobile;
+					iValue += 2 * iFlavorMobile;
 				}
 			}
 

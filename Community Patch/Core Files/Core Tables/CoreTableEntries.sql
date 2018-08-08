@@ -525,8 +525,8 @@ ALTER TABLE Traits ADD COLUMN 'MountainPass' BOOLEAN DEFAULT 0;
 -- Reduces unhappiness in occupied cities w/ Garrison. Negative = reduction.
 ALTER TABLE Policies ADD COLUMN 'GarrisonsOccupiedUnhapppinessMod' INTEGER DEFAULT 0;
 
--- Spawns a free ranged unit with a new city.
-ALTER TABLE Policies ADD COLUMN 'BestRangedUnitSpawnSettle' INTEGER DEFAULT 0;
+-- Spawns a free unit at x population for a city.
+ALTER TABLE Policies ADD COLUMN 'XPopulationConscription' INTEGER DEFAULT 0;
 
 -- No Unhappiness from Expansion
 ALTER TABLE Policies ADD COLUMN 'NoUnhappinessExpansion' BOOLEAN DEFAULT 0;
@@ -539,6 +539,7 @@ ALTER TABLE Policies ADD COLUMN 'DoubleBorderGA' BOOLEAN DEFAULT 0;
 
 -- Free Population
 ALTER TABLE Policies ADD COLUMN 'FreePopulation' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD COLUMN 'FreePopulationCapital' INTEGER DEFAULT 0;
 
 -- Extra Moves for Civilian Units
 ALTER TABLE Policies ADD COLUMN 'ExtraMoves' INTEGER DEFAULT 0;
@@ -586,6 +587,9 @@ ALTER TABLE Beliefs ADD COLUMN 'CombatVersusOtherReligionOwnLands' INTEGER DEFAU
 
 -- Combat bonus v. other religions in their lands
 ALTER TABLE Beliefs ADD COLUMN 'CombatVersusOtherReligionTheirLands' INTEGER DEFAULT 0;
+
+-- Production modifier for units
+ALTER TABLE Beliefs ADD COLUMN 'UnitProductionModifier' INTEGER DEFAULT 0;
 
 -- Influence with CS from missionary spread
 ALTER TABLE Beliefs ADD COLUMN 'MissionaryInfluenceCS' INTEGER DEFAULT 0;
@@ -676,6 +680,11 @@ ALTER TABLE Buildings ADD COLUMN 'CitySupplyModifierGlobal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'CitySupplyFlat' INTEGER DEFAULT 0;
 -- Allows you to define an amount that a city will increase your unit supply cap by a flat value globally.
 ALTER TABLE Buildings ADD COLUMN 'CitySupplyFlatGlobal' INTEGER DEFAULT 0;
+
+-- Allows buildings to modify a city's ranged strike parameters.
+ALTER TABLE Buildings ADD COLUMN 'CityRangedStrikeRange' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'CityIndirectFire' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'RangedStrikeModifier' INTEGER DEFAULT 0;
 
 -- Missionaries built by a city gain % more strength
 ALTER TABLE Buildings ADD COLUMN 'ExtraMissionaryStrengthGlobal' INTEGER DEFAULT 0;
